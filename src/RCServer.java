@@ -234,7 +234,7 @@ public class RCServer extends JFrame{
 						);
 				while(true){
 					socket.receive(inPacket);
-					System.out.print(inPacket.getSocketAddress());
+					//System.out.print(inPacket.getSocketAddress());
 					//socket.send(packet);
 					/*System.out.println("send");
 					System.out.println(
@@ -517,7 +517,7 @@ public class RCServer extends JFrame{
 	    	        FileInputStream fis = new FileInputStream("D:/Workspaces/MyEclipse Professional 2014/RCServer/screenRect.png");    
 	    	        BufferedInputStream bos = new BufferedInputStream(fis);
 	    	        
-	    	        byte [] sendData = new byte[1024];
+	    	        byte [] sendData = new byte[8192];
 	    	        byte [] ack = new byte[10];
 	    	        //用于保存实际读取的字节数
 	    	        int hasRead;
@@ -527,31 +527,28 @@ public class RCServer extends JFrame{
 	    	        //DatagramSocket ssocket;
 	    	        //inPacket = new DatagramPacket(ack, ack.length);
 	    	        
-	    	        
+	    	        DatagramSocket ackSocket = new DatagramSocket(port-1);
+	    	        byte data [] = "ACK".getBytes();
+					//创建一个空的DatagramPacket对象
+					DatagramPacket ackPacket = new DatagramPacket(data,data.length);
 	    	        
 	    	        //使用循环来重复读取数据  
 	    	        while((hasRead = bos.read(sendData)) != -1)
-	    	        {	    	        		    	       	
-	    	        	//System.out.println("getLength" + inPacket.getLength());
-	    	        	//System.out.println("getLength" + inPacket.getOffset());
-	    	        	System.out.println("send ...\n");
-	    	             
+	    	        {	    	        		    	       		    	        	
+	    	        	//System.out.println("send ...\n");	    	             
 	    	        	//将字节数组转换为字符串输出  
-	    	            System.out.print(new String(sendData,0,hasRead));
-	    	            System.out.print("-----------------------------");
-	    	            //System.out.print(inPacket.getAddress());
-	    	            //System.out.print(inPacket.getPort());
+	    	            //System.out.print(new String(sendData,0,hasRead));
 	    	            
 	    	            outPacket = new DatagramPacket(sendData   
 	    	                    , hasRead 
 	    	                    , inPacket.getAddress()
 	    	                    , inPacket.getPort());
 	    	        	
-	    	        	socket.send(outPacket);
+	    	        	socket.send(outPacket);	    	        		    	        		    	        		
 	    	        	
 	    	        	//System.out.println("recv ...\n");
-	    	        	//socket.receive(inPacket);
-	    	        	//System.out.println(new String (inPacket.getData()));
+	    	        	ackSocket.receive(ackPacket);
+	    	        	//System.out.println(new String (ackPacket.getData()));
 	    	        }
 	    	        
 	    	        fis.close();
