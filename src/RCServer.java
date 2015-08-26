@@ -259,6 +259,10 @@ public class RCServer extends JFrame{
 							LeftButton(info);
 						if(type.equals("rightButton"))
 							RightButton(info);
+						if(type.equals("lastPage"))
+							LastPage(info);
+						if(type.equals("nextPage"))
+							NextPage(info);
 						if(type.equals("mousewheel"))
 							MouseWheel(info);
 						if(type.equals("keyboard"))
@@ -320,6 +324,26 @@ public class RCServer extends JFrame{
     			robot.mouseRelease(InputEvent.BUTTON3_MASK);
     		else if(info.equals("up"))
     			robot.mouseRelease(InputEvent.BUTTON3_MASK);
+    	}
+    	
+    	public void LastPage(String info) throws AWTException{
+    		java.awt.Robot robot = new Robot();
+    		if(info.equals("down"))
+				robot.keyPress(KeyEvent.VK_LEFT);
+			if(info.equals("up"))
+				robot.keyRelease(KeyEvent.VK_LEFT);
+			if(info.equals("release"))
+				robot.keyRelease(KeyEvent.VK_LEFT);
+    	}
+    	
+    	public void NextPage(String info) throws AWTException{
+    		java.awt.Robot robot = new Robot();
+    		if(info.equals("down"))
+				robot.keyPress(KeyEvent.VK_RIGHT);
+			if(info.equals("up"))
+				robot.keyRelease(KeyEvent.VK_RIGHT);
+			if(info.equals("release"))
+				robot.keyRelease(KeyEvent.VK_RIGHT);
     	}
     	
     	public void MouseWheel(String info)throws AWTException{
