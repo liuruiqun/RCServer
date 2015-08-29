@@ -8,20 +8,13 @@ import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.Scanner;
 import java.io.*;
 
 import javax.swing.JButton;
@@ -35,9 +28,9 @@ import javax.imageio.ImageIO;
 
 
 public class RCServer extends JFrame{
-	// 以指定字节数组创建准备接收数据的DatagramPacket对象  
-    //private DatagramPacket inPacket = null;   
-    // 定义一个用于发送的DatagramPacket对象  
+	/**
+	 * 
+	 */
     private DatagramPacket outPacket = null;
 	private static int port;
 	private static double mx;	//电脑鼠标的横坐标
@@ -253,6 +246,8 @@ public class RCServer extends JFrame{
 					if(messages.length>=2){
 						type= messages[0];
 						info= messages[1];
+						if(type.equals("connect"))
+							Connect(socket,inPacket);
 						if(type.equals("mouse"))
 							MouseMove(info);
 						if(type.equals("leftButton"))
@@ -265,8 +260,8 @@ public class RCServer extends JFrame{
 							NextPage(info);
 						if(type.equals("mousewheel"))
 							MouseWheel(info);
-						if(type.equals("keyboard"))
-							KeyBoard(info,socket);
+						if(type.equals("movie"))
+							Movie(info,socket);
 						if(type.equals("screen"))
 							Screen(info,socket,inPacket);
 					}
@@ -330,8 +325,6 @@ public class RCServer extends JFrame{
     		java.awt.Robot robot = new Robot();
     		if(info.equals("down"))
 				robot.keyPress(KeyEvent.VK_LEFT);
-			if(info.equals("up"))
-				robot.keyRelease(KeyEvent.VK_LEFT);
 			if(info.equals("release"))
 				robot.keyRelease(KeyEvent.VK_LEFT);
     	}
@@ -340,8 +333,6 @@ public class RCServer extends JFrame{
     		java.awt.Robot robot = new Robot();
     		if(info.equals("down"))
 				robot.keyPress(KeyEvent.VK_RIGHT);
-			if(info.equals("up"))
-				robot.keyRelease(KeyEvent.VK_RIGHT);
 			if(info.equals("release"))
 				robot.keyRelease(KeyEvent.VK_RIGHT);
     	}
@@ -355,7 +346,7 @@ public class RCServer extends JFrame{
     			robot.mouseWheel(-1);
     	}
     	
-    	public void KeyBoard(String info,DatagramSocket socket)throws AWTException, IOException{
+    	public void Movie(String info,DatagramSocket socket)throws AWTException, IOException{
     		String args[]=info.split(",");
     		String type=null;
     		String cont=null;
@@ -396,6 +387,12 @@ public class RCServer extends JFrame{
     					robot.keyRelease(KeyEvent.VK_ENTER);
     				}
     			}
+    			if(cont.equals("Start")){
+    				if(keystate.equals("click")){
+    					robot.mousePress(InputEvent.BUTTON1_MASK);
+    	    			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+    				}
+    			}
     			if(cont.equals("Up")){
     				if(keystate.equals("click")){
     					robot.keyPress(KeyEvent.VK_UP);
@@ -418,12 +415,20 @@ public class RCServer extends JFrame{
     					robot.keyRelease(KeyEvent.VK_DOWN);
     			}
     			if(cont.equals("Left")){
+    				if(keystate.equals("click")){
+    					robot.keyPress(KeyEvent.VK_LEFT);
+    					robot.keyRelease(KeyEvent.VK_LEFT);
+    				}
     				if(keystate.equals("down"))
     					robot.keyPress(KeyEvent.VK_LEFT);
     				if(keystate.equals("up"))
     					robot.keyRelease(KeyEvent.VK_LEFT);
     			}
     			if(cont.equals("Right")){
+    				if(keystate.equals("click")){
+    					robot.keyPress(KeyEvent.VK_RIGHT);
+    					robot.keyRelease(KeyEvent.VK_RIGHT);
+    				}
     				if(keystate.equals("down"))
     					robot.keyPress(KeyEvent.VK_RIGHT);
     				if(keystate.equals("up"))
@@ -580,6 +585,18 @@ public class RCServer extends JFrame{
     			}
     		}
     	}
+    	
+    	public void Connect(DatagramSocket socket,DatagramPacket inPacket) throws AWTException, IOException{
+    		System.out.println("sucess!");
+	        byte [] sendData = "ACK".getBytes();	                    		       	        
+	        outPacket = new DatagramPacket(sendData   
+	                    , sendData.length 
+	                    , inPacket.getAddress()
+	                    , inPacket.getPort());
+	        	
+	        socket.send(outPacket);		        
+		}
 	}
-
 }
+
+
