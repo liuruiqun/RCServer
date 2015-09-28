@@ -36,7 +36,8 @@ public class RCServer extends JFrame{
 	private static double mx;	//电脑鼠标的横坐标
 	private static double my;	//电脑鼠标的纵坐标
 	ServerThread serverthread; //初始化线程
-	final JTextField messagebox;
+	//final JTextField messagebox;
+	final JTextField box;
 	final JTextField field;
 	final JButton stopbutton;
 	final JButton startbutton;
@@ -48,7 +49,8 @@ public class RCServer extends JFrame{
 	public RCServer(){
 		super();
         setTitle("遥控小精灵");
-        setSize(230, 300);
+        //setSize(230, 300);
+        setSize(230, 210);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Toolkit toolkit = getToolkit(); // 获得Toolkit对象
         Dimension dimension = toolkit.getScreenSize(); // 获得Dimension对象
@@ -92,12 +94,17 @@ public class RCServer extends JFrame{
     	stopbutton.setBounds(120,90, 80, 25);
     	getContentPane().add(stopbutton);
     	
-        final JLabel label3 =new JLabel();
+        /*final JLabel label3 =new JLabel();
     	label3.setText("请在手机端输入 本机IP 和 端口号");
     	label3.setBounds(10, 120, 280, 25);
-    	getContentPane().add(label3);
+    	getContentPane().add(label3);*/
     	
-    	final JLabel label4 =new JLabel();
+    	box = new JTextField();
+    	box.setBounds(10, 120, 190, 25);
+    	box.enable(false);
+    	getContentPane().add(box);
+    	
+    	/*final JLabel label4 =new JLabel();
     	label4.setText("接收到信息：");
     	label4.setBounds(10, 150, 280, 20);
     	getContentPane().add(label4);
@@ -108,9 +115,10 @@ public class RCServer extends JFrame{
     	getContentPane().add(messagebox);
     	
     	final JLabel label5 =new JLabel();
-    	label5.setText("左手码农");
-    	label5.setBounds(10, 220, 190, 25);
-    	getContentPane().add(label5);
+    	label5.setText("");
+    	//label5.setBounds(10, 220, 190, 25);
+    	label5.setBounds(10, 150, 280, 20);
+    	getContentPane().add(label5);*/
         
     	
     	
@@ -180,13 +188,15 @@ public class RCServer extends JFrame{
 			serverthread  =new ServerThread();
 			serverthread.start();
 			menux=1;
-			messagebox.setText("开启信息监听");
+			/*messagebox.setText("开启信息监听");*/
+			box.setText("开启信息监听");
 			field.setEditable(false);
 		}
 		if(menux==2){
 			serverthread.resume();
 			menux=1;
-			messagebox.setText("恢复信息监听");
+			/*messagebox.setText("恢复信息监听");*/
+			box.setText("恢复信息监听");
 		}
 	}
 	
@@ -194,7 +204,8 @@ public class RCServer extends JFrame{
 		if(menux==1){
 			serverthread.suspend();
 			menux=2;
-			messagebox.setText("暂停信息监听");
+			/*messagebox.setText("暂停信息监听");*/
+			box.setText("暂停信息监听");
 		}
 		
 	}
@@ -209,7 +220,8 @@ public class RCServer extends JFrame{
     			try{
     				socket = new DatagramSocket(port);
     			}catch(Exception e){
-    				messagebox.setText("端口已被使用,请更换端口");
+    				/*messagebox.setText("端口已被使用,请更换端口");*/
+    				box.setText("端口已被使用,请更换端口");
     				startbutton.setEnabled(true);
     				stopbutton.setEnabled(false);
     				menux=0;
@@ -222,9 +234,9 @@ public class RCServer extends JFrame{
 				//创建一个空的DatagramPacket对象
 				DatagramPacket inPacket = new DatagramPacket(data,data.length);
 				//使用receive方法接收客户端所发送的数据
-				System.out.println(
+				/*System.out.println(
 						"开启端口监听"+socket.getLocalPort()
-						);
+						);*/
 				while(true){
 					socket.receive(inPacket);
 					//System.out.print(inPacket.getSocketAddress());
@@ -240,7 +252,7 @@ public class RCServer extends JFrame{
 					
 					message = new String(inPacket.getData(),inPacket.getOffset(),inPacket.getLength());
 					//System.out.println("message--->" + message);
-					messagebox.setText(message);
+					/*messagebox.setText(message);*/
 					messages = message.split(":");
 										
 					if(messages.length>=2){
@@ -250,6 +262,8 @@ public class RCServer extends JFrame{
 							Connect(socket,inPacket);
 						if(type.equals("mouse"))
 							MouseMove(info);
+						if(type.equals("keyboard"))
+							keyboard(info);
 						if(type.equals("leftButton"))
 							LeftButton(info);
 						if(type.equals("rightButton"))
@@ -344,6 +358,48 @@ public class RCServer extends JFrame{
     			robot.mouseWheel(1);
     		else
     			robot.mouseWheel(-1);
+    	}
+    	
+    	public void keyboard(String info)throws AWTException, IOException{
+    		String args[]=info.split(",");
+    		String type=null;
+    		String cont=null;
+    		if(args.length==2){
+    			type = args[0];
+    			cont = args[1];
+    		}
+    		if(args.length==3){
+    			type = args[0];
+    			cont = args[1];
+    		}
+    		if(type.equals("dosmessage")){
+					
+			    try {  
+			    	String message = cont;
+			    	switch (message)
+			    	{
+			    	case "0":
+			    		Runtime.getRuntime().exec("logoff"); //注销
+			    		break;
+			    	case "1":
+			    		Runtime.getRuntime().exec("shutdown -s"); //一分钟关机
+			    		break;
+			    	case "2":
+			    		Runtime.getRuntime().exec("shutdown -h"); //休眠
+			    		break;
+			    	case "3":
+			    		Runtime.getRuntime().exec("shutdown -a"); 
+			    		break;
+			    	}
+			    	
+			    	/*String[] cmd = {message};
+			    	Runtime.getRuntime().exec(cmd); */
+			    	/*Runtime.getRuntime().exec("cmd /c " + cmd); */   
+	                System.out.println(" success!");  	                	    	        	    	        	                
+	            } catch (IOException e) {  
+	                e.printStackTrace();  
+	            }   
+    		}
     	}
     	
     	public void Movie(String info,DatagramSocket socket)throws AWTException, IOException{
@@ -493,16 +549,6 @@ public class RCServer extends JFrame{
     			}
     			
     			
-    		}else if(type.equals("dosmessage")){
-   							
-			    try {  
-			    	String message = cont;
-			    	String[] cmd = {message};
-			    	Runtime.getRuntime().exec(cmd);    
-	                System.out.println(" success!");  	                	    	        	    	        	                
-	            } catch (IOException e) {  
-	                e.printStackTrace();  
-	            }   
     		}
     	}
     	
@@ -530,7 +576,7 @@ public class RCServer extends JFrame{
 	    			picture.setAutoDelay(1000);
 	    	        //获取屏幕分辨率
 	    	        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-	    	        System.out.println(d);
+	    	        //System.out.println(d);
 	    	        Rectangle screenRect = new Rectangle(d);
 	    	        //截图
 	    	        BufferedImage bufferedImage =  picture.createScreenCapture(screenRect);
@@ -538,12 +584,12 @@ public class RCServer extends JFrame{
 	    	        File file = new File("screenRect.png");
 	    	        ImageIO.write(bufferedImage, "png", file);
 	    	        //压缩
-	    	        System.out.println("开始：" + new Date().toLocaleString());  
-	    	        CompressPic imgCom = new CompressPic("D:\\Workspaces\\MyEclipse Professional 2014\\RCServer\\screenRect.png");  
+	    	        //System.out.println("开始：" + new Date().toLocaleString());  
+	    	        CompressPic imgCom = new CompressPic("screenRect.png");  
 	    	        imgCom.resizeFix(400, 400);  
-	    	        System.out.println("结束：" + new Date().toLocaleString());
+	    	        //System.out.println("结束：" + new Date().toLocaleString());
 	    	        //发送
-	    	        FileInputStream fis = new FileInputStream("D:/Workspaces/MyEclipse Professional 2014/RCServer/screenRect.png");    
+	    	        FileInputStream fis = new FileInputStream("screenRect.png");    
 	    	        BufferedInputStream bos = new BufferedInputStream(fis);
 	    	        
 	    	        byte [] sendData = new byte[8192];

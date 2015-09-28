@@ -62,7 +62,7 @@ public class CompressPic {
         // SCALE_SMOOTH 的缩略算法 生成缩略图片的平滑度的 优先级比速度高 生成的图片质量比较好 但速度慢  
         BufferedImage image = new BufferedImage(w, h,BufferedImage.TYPE_INT_RGB );   
         image.getGraphics().drawImage(img, 0, 0, w, h, null); // 绘制缩小后的图  
-        File destFile = new File("D:\\Workspaces\\MyEclipse Professional 2014\\RCServer\\screenRect.png");  
+        File destFile = new File("screenRect.png");  
         FileOutputStream out = new FileOutputStream(destFile); // 输出到文件流  
         // 可以正常实现bmp、png、gif转jpg  
         JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);  
