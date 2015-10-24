@@ -278,6 +278,8 @@ public class RCServer extends JFrame{
 							Movie(info,socket);
 						if(type.equals("screen"))
 							Screen(info,socket,inPacket);
+						if(type.equals("picture"))
+							Picture(info,socket,inPacket);
 					}
 				
 				}
@@ -590,6 +592,78 @@ public class RCServer extends JFrame{
 	    	        //System.out.println("结束：" + new Date().toLocaleString());
 	    	        //发送
 	    	        FileInputStream fis = new FileInputStream("screenRect.png");    
+	    	        BufferedInputStream bos = new BufferedInputStream(fis);
+	    	        
+	    	        byte [] sendData = new byte[8192];
+	    	        byte [] ack = new byte[10];
+	    	        //用于保存实际读取的字节数
+	    	        int hasRead;
+	    	        
+	    	        //System.out.println("Server starting ...\n");
+	    	        //DatagramSocket s = new DatagramSocket(10000);
+	    	        //DatagramSocket ssocket;
+	    	        //inPacket = new DatagramPacket(ack, ack.length);
+	    	        
+	    	        DatagramSocket ackSocket = new DatagramSocket(port-1);
+	    	        byte data [] = "ACK".getBytes();
+					//创建一个空的DatagramPacket对象
+					DatagramPacket ackPacket = new DatagramPacket(data,data.length);
+	    	        
+	    	        //使用循环来重复读取数据  
+	    	        while((hasRead = bos.read(sendData)) != -1)
+	    	        {	    	        		    	       		    	        	
+	    	        	//System.out.println("send ...\n");	    	             
+	    	        	//将字节数组转换为字符串输出  
+	    	            //System.out.print(new String(sendData,0,hasRead));
+	    	            
+	    	            outPacket = new DatagramPacket(sendData   
+	    	                    , hasRead 
+	    	                    , inPacket.getAddress()
+	    	                    , inPacket.getPort());
+	    	        	
+	    	        	socket.send(outPacket);	    	        		    	        		    	        		
+	    	        	
+	    	        	//System.out.println("recv ...\n");
+	    	        	ackSocket.receive(ackPacket);
+	    	        	//System.out.println(new String (ackPacket.getData()));
+	    	        }
+	    	        
+	    	        fis.close();
+	    	        bos.close();
+    			}
+    		}
+    	}
+    	
+    	public void Picture(String info,DatagramSocket socket,DatagramPacket inPacket) throws AWTException, IOException{
+    		String args[]=info.split(",");
+    		String type=null;
+    		String cont=null;
+    		String keystate =null;
+    		
+    		if(args.length==2){
+    			type = args[0];
+    			cont = args[1];
+    		}
+    		if(args.length==3){
+    			type = args[0];
+    			cont = args[1];
+    			keystate = args[2];
+    		}
+    		
+    		
+    		if(type.equals("message")){
+    			if(cont.equals("Start")){
+    				CameraCapture picture = new CameraCapture();
+    				picture.capture();
+    				picture.save();
+    				System.out.println("CameraCapture OK");
+	    	        //压缩
+	    	        /*//System.out.println("开始：" + new Date().toLocaleString());  
+	    	        CompressPic imgCom = new CompressPic("screenRect.png");  
+	    	        imgCom.resizeFix(400, 400);  
+	    	        //System.out.println("结束：" + new Date().toLocaleString());
+*/	    	        //发送
+	    	        FileInputStream fis = new FileInputStream("CameraCapture.jpg");    
 	    	        BufferedInputStream bos = new BufferedInputStream(fis);
 	    	        
 	    	        byte [] sendData = new byte[8192];
